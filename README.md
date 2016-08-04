@@ -16,8 +16,7 @@ Getting this right requires:
 
 This little lib makes it easy
 
-Example
-
+Example using a database call (but really, any expensive async call works):
 
 ```coffeescript
 ACache = require('acache').ACache
