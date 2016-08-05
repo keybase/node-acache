@@ -10,16 +10,16 @@ Sometimes you want to:
 
 Getting this right requires:
  * creating an LRU
- * a locking mechanism, so a bunch of concurrent cache misses for the same object don't cause extra work
+ * a locking mechanism, so a bunch of calls for the same data on a cold cache don't cause multiple executions of your expensive function for the same data
  * turning inputs into a cache key
  * an easy uncaching call
 
-This little lib makes it easy
+This little lib makes it easy.
 
-Example using a database call (but really, any expensive async call works):
+Coffeescript example using a database call (but really, any expensive async call works):
 
 ```coffeescript
-ACache = require('acache').ACache
+{ACache} = require 'acache'
 
 ac = new ACache {max_age_ms: 10000, max_storage: 100}
 
@@ -27,7 +27,7 @@ ac = new ACache {max_age_ms: 10000, max_storage: 100}
 ac.query {
   key_by: [uid, friend_uid] # cache using both of these
   fn: (cb) ->
-    mysql.query 'SELECT BLEAH BLEAH WHERE SOMETHING=? AND SOMETHING=?', [uid, friend_uid], cb
+    mysql.query 'SELECT BLEAH WHERE FOO=? AND BAR=?', [uid, friend_uid], cb
 }, defer err, rows, info
 
 # remove something from the cache
@@ -40,11 +40,13 @@ ac.uncache {key_by: [uid, friend_uid]}
 
 ### `query` params:
  * arg0 (object):
-   * `key_by` : a key for this cache call. Feel free to pass an object or array; it will be hashed
+   * `key_by` : a key for this cache call. Feel free to pass a string, number, or object; it will be hashed
    * `fn` : a function to run, to fill the cache, if it's missing. your function should take one parameter, `cb`. It should then call `cb` with `err, res1, res2,...`
  * arg1 (fn) :
-   * a function you want called with `err, res1, res2, ...` from either the cache or hot read
+   * a function you want called with the results of your `fn`. Say, `err, res1, res2, ...` from either the cache or hot read
 
 ## Errors
 
-This does not cache errors.
+This does not cache errors. If you want to cache errors you can easily call back with `null, {err, res}`.
+
+
