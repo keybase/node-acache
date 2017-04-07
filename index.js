@@ -52,7 +52,7 @@
                 return lock = arguments[0];
               };
             })(),
-            lineno: 28
+            lineno: 26
           }), true);
           __iced_deferrals._fulfill();
         });
@@ -69,7 +69,7 @@
                       funcname: "ACache.query"
                     });
                     process.nextTick(__iced_deferrals.defer({
-                      lineno: 31
+                      lineno: 29
                     }));
                     __iced_deferrals._fulfill();
                   })(__iced_k);
@@ -91,7 +91,7 @@
                       return res_array = __slice.call(arguments, 1);
                     };
                   })(),
-                  lineno: 33
+                  lineno: 31
                 }));
                 __iced_deferrals._fulfill();
               })(function() {
