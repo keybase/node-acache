@@ -1,6 +1,6 @@
 {
   "name": "acache",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "A simple JavaScript locking/caching of async queries/call results",
   "main": "index.js",
   "scripts": {
@@ -28,7 +28,7 @@
   "dependencies": {
     "iced-runtime": "^1.0.3",
     "iced-utils": "^0.1.24",
-    "kb-node-lru": "^2.0.0",
+    "kb-node-lru": "^2.0.2",
     "object-hash": "^1.1.7"
   }
 }
