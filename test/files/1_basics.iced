@@ -133,6 +133,7 @@ exports.manual_put = (T, cb) ->
   t2 = Date.now()
 
   T.assert (c.size() is 1), 'cache size()'
+  T.assert (c.stats().size is 1), 'cache stats().size'
   T.assert (c.stats().misses is 0), 'cache miss count'
   T.assert (c.stats().hits is 1), 'cache hit count'
   T.assert (c.stats().puts is 1), 'cache puts'

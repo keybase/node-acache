@@ -120,7 +120,8 @@
       return {
         hits: this._hits,
         misses: this._misses,
-        puts: this._puts
+        puts: this._puts,
+        size: this.size()
       };
     };
 

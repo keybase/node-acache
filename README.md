@@ -39,6 +39,8 @@ ac.put {key_by}, val
 # since this is simulating a fn call, you can also manually add multiple args to match callback:
 ac.put {key_by}, v1, v2, v3
 
+# check some basic stats
+console.log ac.stats() # size, hits, misses, etc.
 ```
 
 ### constructor params:

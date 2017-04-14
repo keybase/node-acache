@@ -46,7 +46,7 @@ class ACache
 
   ##----------------------------------------------------------------------
 
-  stats: -> {hits: @_hits, misses: @_misses, puts: @_puts}
+  stats: -> {hits: @_hits, misses: @_misses, puts: @_puts, size: @size()}
 
   ##----------------------------------------------------------------------
 
