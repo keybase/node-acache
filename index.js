@@ -29,6 +29,9 @@
       });
       this._lock_table = new LockTable();
       this._counter = 0;
+      this._hits = 0;
+      this._misses = 0;
+      this._puts = 0;
     }
 
     ACache.prototype.query = function(_arg, cb) {
@@ -52,64 +55,87 @@
                 return lock = arguments[0];
               };
             })(),
-            lineno: 26
+            lineno: 29
           }), true);
           __iced_deferrals._fulfill();
         });
       })(this)((function(_this) {
         return function() {
           (function(__iced_k) {
-            if ((res_array = _this._lru.get(ckey))) {
-              (function(__iced_k) {
-                if (_this._counter++ % 100 === 0) {
-                  (function(__iced_k) {
-                    __iced_deferrals = new iced.Deferrals(__iced_k, {
-                      parent: ___iced_passed_deferral,
-                      filename: "/Users/chris/git/keybase/node-acache/index.iced",
-                      funcname: "ACache.query"
-                    });
-                    process.nextTick(__iced_deferrals.defer({
-                      lineno: 29
-                    }));
-                    __iced_deferrals._fulfill();
-                  })(__iced_k);
-                } else {
-                  return __iced_k();
-                }
-              })(__iced_k);
-            } else {
+            if (_this._counter++ % 100 === 0) {
               (function(__iced_k) {
                 __iced_deferrals = new iced.Deferrals(__iced_k, {
                   parent: ___iced_passed_deferral,
                   filename: "/Users/chris/git/keybase/node-acache/index.iced",
                   funcname: "ACache.query"
                 });
-                fn(__iced_deferrals.defer({
-                  assign_fn: (function() {
-                    return function() {
-                      err = arguments[0];
-                      return res_array = __slice.call(arguments, 1);
-                    };
-                  })(),
+                process.nextTick(__iced_deferrals.defer({
                   lineno: 31
                 }));
                 __iced_deferrals._fulfill();
-              })(function() {
-                return __iced_k(err == null ? _this._lru.put(ckey, res_array) : void 0);
-              });
+              })(__iced_k);
+            } else {
+              return __iced_k();
             }
           })(function() {
-            cb.apply(null, [err].concat(__slice.call(res_array)));
-            return lock.release();
+            (function(__iced_k) {
+              if ((res_array = _this._lru.get(ckey))) {
+                return __iced_k(_this._hits++);
+              } else {
+                _this._misses++;
+                (function(__iced_k) {
+                  __iced_deferrals = new iced.Deferrals(__iced_k, {
+                    parent: ___iced_passed_deferral,
+                    filename: "/Users/chris/git/keybase/node-acache/index.iced",
+                    funcname: "ACache.query"
+                  });
+                  fn(__iced_deferrals.defer({
+                    assign_fn: (function() {
+                      return function() {
+                        err = arguments[0];
+                        return res_array = __slice.call(arguments, 1);
+                      };
+                    })(),
+                    lineno: 36
+                  }));
+                  __iced_deferrals._fulfill();
+                })(function() {
+                  return __iced_k(err == null ? _this._lru.put(ckey, res_array) : void 0);
+                });
+              }
+            })(function() {
+              cb.apply(null, [err].concat(__slice.call(res_array)));
+              return lock.release();
+            });
           });
         };
       })(this));
+    };
+
+    ACache.prototype.size = function() {
+      return this._lru.size();
+    };
+
+    ACache.prototype.stats = function() {
+      return {
+        hits: this._hits,
+        misses: this._misses,
+        puts: this._puts
+      };
     };
 
     ACache.prototype.uncache = function(_arg) {
       var key_by;
       key_by = _arg.key_by;
       return this._lru.remove(this._cacheKey(key_by));
+    };
+
+    ACache.prototype.put = function() {
+      var key_by, res_array, _arg;
+      _arg = arguments[0], res_array = 2 <= arguments.length ? __slice.call(arguments, 1) : [];
+      key_by = _arg.key_by;
+      this._lru.put(this._cacheKey(key_by), res_array);
+      return this._puts++;
     };
 
     ACache.prototype._cacheKey = function(o) {

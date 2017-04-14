@@ -32,6 +32,13 @@ ac.query {
 
 # remove something from the cache
 ac.uncache {key_by: [uid, friend_uid]}
+
+# manually add something
+ac.put {key_by}, val
+
+# since this is simulating a fn call, you can also manually add multiple args to match callback:
+ac.put {key_by}, v1, v2, v3
+
 ```
 
 ### constructor params:

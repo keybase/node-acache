@@ -18,6 +18,8 @@ exports.timing_check = (T, cb) ->
     fn: (cb) -> async_arithmetic arg, cb
   }, defer err, sum, diff
   t2 = Date.now()
+  T.assert (c.stats().misses is 1), 'cache miss count'
+  T.assert (c.stats().hits is 0), 'cache hit count'
   T.assert (sum   is 3), 'sum ok'
   T.assert (diff is -1), 'diff ok'
   await c.query {
@@ -31,6 +33,9 @@ exports.timing_check = (T, cb) ->
   # let's make sure second call was fast
   T.assert (t2 - t1 > 90), 'first call slow'
   T.assert (t3 - t2 < 10),  'second call fast'
+  T.assert (c.stats().misses is 1), 'cache miss count'
+  T.assert (c.stats().hits is 1), 'cache hit count'
+  T.assert (c.size() is 1), 'cache size()'
   cb()
 
 # -------
@@ -58,6 +63,9 @@ exports.expiration = (T, cb) ->
   # let's make sure second call was fast
   T.assert (t2 - t1 > 90), 'first call slow'
   T.assert (t3 - t2 > 90),  'second call slow'
+
+  T.assert (c.size() is 1), 'cache size()'
+
   cb()
 
 # -------
@@ -110,6 +118,29 @@ exports.locking = (T, cb) ->
   await async_counter defer count
   T.assert (count is 13), 'same key, same locks'
   cb()
+
+# -------
+
+exports.manual_put = (T, cb) ->
+  c = new ACache {max_age_ms: 50, max_storage: 3}
+  arg = {a:1,b:2,delay:100}
+  c.put {key_by: arg}, 3, -1
+
+  await c.query {
+    key_by: arg
+    fn: (cb) -> async_arithmetic arg, cb
+  }, defer err, sum, diff
+  t2 = Date.now()
+
+  T.assert (c.size() is 1), 'cache size()'
+  T.assert (c.stats().misses is 0), 'cache miss count'
+  T.assert (c.stats().hits is 1), 'cache hit count'
+  T.assert (c.stats().puts is 1), 'cache puts'
+  T.assert (sum   is 3), 'sum ok'
+  T.assert (diff is -1), 'diff ok'
+
+  cb()
+
 
 
 
