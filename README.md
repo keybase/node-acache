@@ -16,7 +16,9 @@ Getting this right requires:
 
 This little lib makes it easy.
 
-Coffeescript example using a database call (but really, any expensive async call works):
+Coffeescript example using a database call (but really, any expensive async call works).
+
+`ac.query` always calls back with (err, result).
 
 ```coffeescript
 {ACache} = require 'acache'
@@ -27,17 +29,16 @@ ac = new ACache {max_age_ms: 10000, max_storage: 100}
 ac.query {
   key_by: [uid, friend_uid] # cache using both of these
   fn: (cb) ->
-    mysql.query 'SELECT BLEAH WHERE FOO=? AND BAR=?', [uid, friend_uid], cb
-}, defer err, rows, info
+    mysql.query 'SELECT BLEAH WHERE FOO=? AND BAR=?', [uid, friend_uid], (err, rows, info) ->
+      res = {rows, info}
+      cb err, res
+}, defer err, res
 
 # remove something from the cache
 ac.uncache {key_by: [uid, friend_uid]}
 
 # manually add something
 ac.put {key_by}, val
-
-# since this is simulating a fn call, you can also manually add multiple args to match callback:
-ac.put {key_by}, v1, v2, v3
 
 # check some basic stats
 console.log ac.stats() # size, hits, misses, etc.
@@ -50,9 +51,9 @@ console.log ac.stats() # size, hits, misses, etc.
 ### `query` params:
  * arg0 (object):
    * `key_by` : a key for this cache call. Feel free to pass a string, number, or object; it will be hashed
-   * `fn` : a function to run, to fill the cache, if it's missing. your function should take one parameter, `cb`. It should then call `cb` with `err, res1, res2,...`
+   * `fn` : a function to run, to fill the cache, if it's missing. your function should take one parameter, `cb`. It should then call `cb` with `err, res`
  * arg1 (fn) :
-   * a function you want called with the results of your `fn`. Say, `err, res1, res2, ...` from either the cache or hot read
+   * a function you want called with the results of your `fn`. Say, `err, res` from either the cache or hot read
 
 ## Errors
 
