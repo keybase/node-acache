@@ -2,7 +2,11 @@
 
 async_arithmetic = ({a,b,delay}, cb) ->
   await setTimeout defer(), delay
-  cb null, (a+b), (a-b)
+  cb null, {sum: (a+b), diff: (a-b)}
+
+async_add = ({a,b,delay}, cb) ->
+  await setTimeout defer(), delay
+  cb null, a+b
 
 _counter = 0
 async_counter = (cb) ->
@@ -16,7 +20,7 @@ exports.timing_check = (T, cb) ->
   await c.query {
     key_by: arg
     fn: (cb) -> async_arithmetic arg, cb
-  }, defer err, sum, diff
+  }, defer err, {sum, diff}
   t2 = Date.now()
   T.assert (c.stats().misses is 1), 'cache miss count'
   T.assert (c.stats().hits is 0), 'cache hit count'
@@ -25,7 +29,7 @@ exports.timing_check = (T, cb) ->
   await c.query {
     key_by: arg
     fn: (cb) -> async_arithmetic arg, cb
-  }, defer err, sum, diff
+  }, defer err, {sum, diff}
   t3 = Date.now()
   T.assert (sum   is 3), 'cached sum ok'
   T.assert (diff is -1), 'cached diff ok'
@@ -47,7 +51,7 @@ exports.expiration = (T, cb) ->
   await c.query {
     key_by: arg
     fn: (cb) -> async_arithmetic arg, cb
-  }, defer err, sum, diff
+  }, defer err, {sum, diff}
   t2 = Date.now()
   T.assert (sum   is 3), 'sum ok'
   T.assert (diff is -1), 'diff ok'
@@ -55,7 +59,7 @@ exports.expiration = (T, cb) ->
   await c.query {
     key_by: arg
     fn: (cb) -> async_arithmetic arg, cb
-  }, defer err, sum, diff
+  }, defer err, {sum, diff}
   t3 = Date.now()
   T.assert (sum   is 3), 'cached sum ok'
   T.assert (diff is -1), 'cached diff ok'
@@ -77,7 +81,7 @@ exports.uncache = (T, cb) ->
   await c.query {
     key_by: arg
     fn: (cb) -> async_arithmetic arg, cb
-  }, defer err, sum, diff
+  }, defer err, {sum, diff}
   t2 = Date.now()
   T.assert (sum   is 3), 'sum ok'
   T.assert (diff is -1), 'diff ok'
@@ -85,7 +89,7 @@ exports.uncache = (T, cb) ->
   await c.query {
     key_by: arg
     fn: (cb) -> async_arithmetic arg, cb
-  }, defer err, sum, diff
+  }, defer err, {sum, diff}
   t3 = Date.now()
   T.assert (sum   is 3), 'cached sum ok'
   T.assert (diff is -1), 'cached diff ok'
@@ -124,12 +128,12 @@ exports.locking = (T, cb) ->
 exports.manual_put = (T, cb) ->
   c = new ACache {max_age_ms: 50, max_storage: 3}
   arg = {a:1,b:2,delay:100}
-  c.put {key_by: arg}, 3, -1
+  c.put {key_by: arg}, {sum: 3, diff: -1}
 
   await c.query {
     key_by: arg
     fn: (cb) -> async_arithmetic arg, cb
-  }, defer err, sum, diff
+  }, defer err, {sum, diff}
   t2 = Date.now()
 
   T.assert (c.size() is 1), 'cache size()'
@@ -139,6 +143,61 @@ exports.manual_put = (T, cb) ->
   T.assert (c.stats().puts is 1), 'cache puts'
   T.assert (sum   is 3), 'sum ok'
   T.assert (diff is -1), 'diff ok'
+
+  cb()
+
+# -------
+
+exports.no_cache_error = (T, cb) ->
+  c = new ACache {max_age_ms: 50, max_storage: 3}
+  arg = {a:1,b:2,delay:100}
+
+  await c.query {
+    key_by: arg
+    fn: (cb) -> cb new Error(), arg
+  }, defer err, res
+
+  t2 = Date.now()
+
+  await c.query {
+    key_by: arg
+    fn: (cb) -> cb new Error(), arg
+  }, defer err, res
+
+  T.assert (c.size() is 0), 'cache size()'
+  T.assert (c.stats().size is 0), 'cache stats().size'
+  T.assert (c.stats().misses is 2), 'cache miss count'
+  T.assert (c.stats().hits is 0), 'cache hit count'
+  T.assert (c.stats().puts is 0), 'cache puts'
+  T.assert err?, 'error returned'
+
+  cb()
+
+
+# -------
+
+exports.zero_answer_cached = (T, cb) ->
+  c = new ACache {max_age_ms: 50, max_storage: 3}
+  arg = {a:0,b:0,delay:100}
+
+  await c.query {
+    key_by: arg
+    fn: (cb) -> async_add arg, cb
+  }, defer err, res
+  T.assert (not err) and (res is 0), "got 0"
+
+  t2 = Date.now()
+
+  await c.query {
+    key_by: arg
+    fn: (cb) -> async_add arg, cb
+  }, defer err, res
+  T.assert (not err) and (res is 0), "got 0"
+
+  T.assert (c.size() is 1), 'cache size()'
+  T.assert (c.stats().size is 1), 'cache stats().size'
+  T.assert (c.stats().misses is 1), 'cache miss count'
+  T.assert (c.stats().hits is 1), 'cache hit count'
 
   cb()
 

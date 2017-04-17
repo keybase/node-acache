@@ -26,18 +26,18 @@ class ACache
   query: ({fn, key_by}, cb) ->
     ckey       = @_cacheKey key_by
     err        = null
-    res_array  = null
+    res        = null
     await @_lock_table.acquire ckey, defer(lock), true
     if @_counter++ % 100 is 0 # faster than doing it every time
       await process.nextTick defer()
-    if (res_array = @_lru.get ckey)
+    if typeof (res = @_lru.get ckey) isnt 'undefined'
       @_hits++
     else
       @_misses++
-      await fn defer err, res_array...
+      await fn defer err, res
       unless err?
-        @_lru.put ckey, res_array
-    cb err, res_array... # call back with args separated
+        @_lru.put ckey, res
+    cb err, res
     lock.release()
 
   ##----------------------------------------------------------------------
@@ -54,9 +54,9 @@ class ACache
 
   ##----------------------------------------------------------------------
 
-  put: ({key_by}, res_array...) ->
+  put: ({key_by}, res) ->
     # manually put something into the cache
-    @_lru.put @_cacheKey(key_by), res_array
+    @_lru.put @_cacheKey(key_by), res
     @_puts++
 
   ##----------------------------------------------------------------------
