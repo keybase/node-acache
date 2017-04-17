@@ -4,6 +4,10 @@ async_arithmetic = ({a,b,delay}, cb) ->
   await setTimeout defer(), delay
   cb null, {sum: (a+b), diff: (a-b)}
 
+async_add = ({a,b,delay}, cb) ->
+  await setTimeout defer(), delay
+  cb null, a+b
+
 _counter = 0
 async_counter = (cb) ->
   await setTimeout defer(), 10
@@ -169,6 +173,33 @@ exports.no_cache_error = (T, cb) ->
 
   cb()
 
+
+# -------
+
+exports.zero_answer_cached = (T, cb) ->
+  c = new ACache {max_age_ms: 50, max_storage: 3}
+  arg = {a:0,b:0,delay:100}
+
+  await c.query {
+    key_by: arg
+    fn: (cb) -> async_add arg, cb
+  }, defer err, res
+  T.assert (not err) and (res is 0), "got 0"
+
+  t2 = Date.now()
+
+  await c.query {
+    key_by: arg
+    fn: (cb) -> async_add arg, cb
+  }, defer err, res
+  T.assert (not err) and (res is 0), "got 0"
+
+  T.assert (c.size() is 1), 'cache size()'
+  T.assert (c.stats().size is 1), 'cache stats().size'
+  T.assert (c.stats().misses is 1), 'cache miss count'
+  T.assert (c.stats().hits is 1), 'cache hit count'
+
+  cb()
 
 
 
