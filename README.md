@@ -44,6 +44,16 @@ ac.put {key_by}, val
 console.log ac.stats() # size, hits, misses, etc.
 ```
 
+### Curious if the cache was hit
+
+```coffeescript
+It calls back with a 3rd boolean param, whether the cache was hit:
+ac.query {
+  key_by: whatever
+  fn: (cb) -> cb null, "hello world"
+}, defer err, res, did_hit
+```
+
 ### constructor params:
  * `max_age_ms`: max time to store something in cache
  * `max_storage`: max answers to cache

@@ -20,19 +20,21 @@ exports.timing_check = (T, cb) ->
   await c.query {
     key_by: arg
     fn: (cb) -> async_arithmetic arg, cb
-  }, defer err, {sum, diff}
+  }, defer err, {sum, diff}, did_hit
   t2 = Date.now()
   T.assert (c.stats().misses is 1), 'cache miss count'
   T.assert (c.stats().hits is 0), 'cache hit count'
   T.assert (sum   is 3), 'sum ok'
   T.assert (diff is -1), 'diff ok'
+  T.assert (not did_hit), 'missed cache'
   await c.query {
     key_by: arg
     fn: (cb) -> async_arithmetic arg, cb
-  }, defer err, {sum, diff}
+  }, defer err, {sum, diff}, did_hit
   t3 = Date.now()
   T.assert (sum   is 3), 'cached sum ok'
   T.assert (diff is -1), 'cached diff ok'
+  T.assert did_hit, 'hit cache'
 
   # let's make sure second call was fast
   T.assert (t2 - t1 > 90), 'first call slow'
@@ -133,9 +135,10 @@ exports.manual_put = (T, cb) ->
   await c.query {
     key_by: arg
     fn: (cb) -> async_arithmetic arg, cb
-  }, defer err, {sum, diff}
+  }, defer err, {sum, diff}, did_hit
   t2 = Date.now()
 
+  T.assert did_hit, "hit after put"
   T.assert (c.size() is 1), 'cache size()'
   T.assert (c.stats().size is 1), 'cache stats().size'
   T.assert (c.stats().misses is 0), 'cache miss count'

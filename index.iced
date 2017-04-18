@@ -27,17 +27,20 @@ class ACache
     ckey       = @_cacheKey key_by
     err        = null
     res        = null
+    did_hit    = false
     await @_lock_table.acquire ckey, defer(lock), true
     if @_counter++ % 100 is 0 # faster than doing it every time
       await process.nextTick defer()
     if typeof (res = @_lru.get ckey) isnt 'undefined'
       @_hits++
+      did_hit = true
     else
       @_misses++
       await fn defer err, res
       unless err?
         @_lru.put ckey, res
-    cb err, res
+    cb err, res, did_hit
+
     lock.release()
 
   ##----------------------------------------------------------------------
