@@ -36,12 +36,17 @@ exports.timing_check = (T, cb) ->
   T.assert (diff is -1), 'cached diff ok'
   T.assert did_hit, 'hit cache'
 
+  T.assert c.peek({key_by:arg})?, "peeked"
+  T.assert not(c.peek({key_by:"foo"})?), "peek failed"
+  c.put { key_by : "foo" }, "blah"
+  T.assert c.peek({key_by:"foo"})?, "peek worked"
+
   # let's make sure second call was fast
   T.assert (t2 - t1 > 90), 'first call slow'
   T.assert (t3 - t2 < 10),  'second call fast'
   T.assert (c.stats().misses is 1), 'cache miss count'
   T.assert (c.stats().hits is 1), 'cache hit count'
-  T.assert (c.size() is 1), 'cache size()'
+  T.assert (c.size() is 2), 'cache size()'
   cb()
 
 # -------
