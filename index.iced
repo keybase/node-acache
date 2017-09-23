@@ -64,6 +64,11 @@ class ACache
 
   ##----------------------------------------------------------------------
 
+  peek : ({key_by}) ->
+    @_lru.get @_cacheKey(key_by)
+
+  ##----------------------------------------------------------------------
+
   _cacheKey: (o) ->
     # for strings we'd rather not hash which ends up being expensive
     if (typeof(o) is 'string') and o.length <= CONFIG.MAX_STRING_AS_KEY then return o

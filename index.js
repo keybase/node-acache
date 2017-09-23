@@ -46,7 +46,7 @@
         return (function(__iced_k) {
           __iced_deferrals = new iced.Deferrals(__iced_k, {
             parent: ___iced_passed_deferral,
-            filename: "/Users/chris/git/keybase/node-acache/index.iced",
+            filename: "/Users/max/src/keybase/acache/index.iced",
             funcname: "ACache.query"
           });
           _this._lock_table.acquire(ckey, __iced_deferrals.defer({
@@ -66,7 +66,7 @@
               (function(__iced_k) {
                 __iced_deferrals = new iced.Deferrals(__iced_k, {
                   parent: ___iced_passed_deferral,
-                  filename: "/Users/chris/git/keybase/node-acache/index.iced",
+                  filename: "/Users/max/src/keybase/acache/index.iced",
                   funcname: "ACache.query"
                 });
                 process.nextTick(__iced_deferrals.defer({
@@ -87,7 +87,7 @@
                 (function(__iced_k) {
                   __iced_deferrals = new iced.Deferrals(__iced_k, {
                     parent: ___iced_passed_deferral,
-                    filename: "/Users/chris/git/keybase/node-acache/index.iced",
+                    filename: "/Users/max/src/keybase/acache/index.iced",
                     funcname: "ACache.query"
                   });
                   fn(__iced_deferrals.defer({
@@ -137,6 +137,12 @@
       key_by = _arg.key_by;
       this._lru.put(this._cacheKey(key_by), res);
       return this._puts++;
+    };
+
+    ACache.prototype.peek = function(_arg) {
+      var key_by;
+      key_by = _arg.key_by;
+      return this._lru.get(this._cacheKey(key_by));
     };
 
     ACache.prototype._cacheKey = function(o) {
