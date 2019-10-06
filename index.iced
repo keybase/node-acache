@@ -14,7 +14,7 @@ CONFIG =
 class ACache
 
   constructor: ({max_storage, max_age_ms, size_fn}) ->
-    @_lru        = new LRU {max_storage, max_age_ms}
+    @_lru        = new LRU {maxStorage: max_storage, maxAgeMs: max_age_ms, sizeFn: size_fn}
     @_lock_table = new LockTable()
     @_counter    = 0
     @_hits       = 0
