@@ -13,8 +13,8 @@ CONFIG =
 
 class ACache
 
-  constructor: ({max_storage, max_age_ms, size_fn}) ->
-    @_lru        = new LRU {maxStorage: max_storage, maxAgeMs: max_age_ms, sizeFn: size_fn}
+  constructor: ({maxStorage, maxAgeMs, sizeFn}) ->
+    @_lru        = new LRU {maxStorage: maxStorage, maxAgeMs: maxAgeMs, sizeFn: sizeFn}
     @_lock_table = new LockTable()
     @_counter    = 0
     @_hits       = 0
@@ -23,8 +23,8 @@ class ACache
 
   ##----------------------------------------------------------------------
 
-  query: ({fn, key_by}, cb) ->
-    ckey       = @_cacheKey key_by
+  query: ({fn, keyBy}, cb) ->
+    ckey       = @_cacheKey keyBy
     err        = null
     res        = null
     did_hit    = false
@@ -53,19 +53,19 @@ class ACache
 
   ##----------------------------------------------------------------------
 
-  uncache: ({key_by}) -> @_lru.remove @_cacheKey key_by
+  uncache: ({keyBy}) -> @_lru.remove @_cacheKey keyBy
 
   ##----------------------------------------------------------------------
 
-  put: ({key_by}, res) ->
+  put: ({keyBy}, res) ->
     # manually put something into the cache
-    @_lru.put @_cacheKey(key_by), res
+    @_lru.put @_cacheKey(keyBy), res
     @_puts++
 
   ##----------------------------------------------------------------------
 
-  peek : ({key_by}) ->
-    @_lru.get @_cacheKey(key_by)
+  peek : ({keyBy}) ->
+    @_lru.get @_cacheKey(keyBy)
 
   ##----------------------------------------------------------------------
 
