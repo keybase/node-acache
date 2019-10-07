@@ -14,11 +14,11 @@ async_counter = (cb) ->
   cb ++_counter
 
 exports.timing_check = (T, cb) ->
-  c = new ACache {max_age_ms: 1000, max_storage: 3}
+  c = new ACache {maxAgeMs: 1000, maxStorage: 3}
   arg = {a:1,b:2,delay:100}
   t1 = Date.now()
   await c.query {
-    key_by: arg
+    keyBy: arg
     fn: (cb) -> async_arithmetic arg, cb
   }, defer err, {sum, diff}, did_hit
   t2 = Date.now()
@@ -28,7 +28,7 @@ exports.timing_check = (T, cb) ->
   T.assert (diff is -1), 'diff ok'
   T.assert (not did_hit), 'missed cache'
   await c.query {
-    key_by: arg
+    keyBy: arg
     fn: (cb) -> async_arithmetic arg, cb
   }, defer err, {sum, diff}, did_hit
   t3 = Date.now()
@@ -36,10 +36,10 @@ exports.timing_check = (T, cb) ->
   T.assert (diff is -1), 'cached diff ok'
   T.assert did_hit, 'hit cache'
 
-  T.assert c.peek({key_by:arg})?, "peeked"
-  T.assert not(c.peek({key_by:"foo"})?), "peek failed"
-  c.put { key_by : "foo" }, "blah"
-  T.assert c.peek({key_by:"foo"})?, "peek worked"
+  T.assert c.peek({keyBy:arg})?, "peeked"
+  T.assert not(c.peek({keyBy:"foo"})?), "peek failed"
+  c.put { keyBy : "foo" }, "blah"
+  T.assert c.peek({keyBy:"foo"})?, "peek worked"
 
   # let's make sure second call was fast
   T.assert (t2 - t1 > 90), 'first call slow'
@@ -52,11 +52,11 @@ exports.timing_check = (T, cb) ->
 # -------
 
 exports.expiration = (T, cb) ->
-  c = new ACache {max_age_ms: 100, max_storage: 2}
+  c = new ACache {maxAgeMs: 100, maxStorage: 2}
   arg = {a:1,b:2,delay:200}
   t1 = Date.now()
   await c.query {
-    key_by: arg
+    keyBy: arg
     fn: (cb) -> async_arithmetic arg, cb
   }, defer err, {sum, diff}
   t2 = Date.now()
@@ -64,7 +64,7 @@ exports.expiration = (T, cb) ->
   T.assert (diff is -1), 'diff ok'
   await setTimeout defer(), 200
   await c.query {
-    key_by: arg
+    keyBy: arg
     fn: (cb) -> async_arithmetic arg, cb
   }, defer err, {sum, diff}
   t3 = Date.now()
@@ -82,19 +82,19 @@ exports.expiration = (T, cb) ->
 # -------
 
 exports.uncache = (T, cb) ->
-  c = new ACache {max_age_ms: 1000, max_storage: 100}
+  c = new ACache {maxAgeMs: 1000, maxStorage: 100}
   arg = {a:1,b:2,delay:100}
   t1 = Date.now()
   await c.query {
-    key_by: arg
+    keyBy: arg
     fn: (cb) -> async_arithmetic arg, cb
   }, defer err, {sum, diff}
   t2 = Date.now()
   T.assert (sum   is 3), 'sum ok'
   T.assert (diff is -1), 'diff ok'
-  c.uncache {key_by: arg}
+  c.uncache {keyBy: arg}
   await c.query {
-    key_by: arg
+    keyBy: arg
     fn: (cb) -> async_arithmetic arg, cb
   }, defer err, {sum, diff}
   t3 = Date.now()
@@ -109,11 +109,11 @@ exports.uncache = (T, cb) ->
 # -------
 
 exports.locking = (T, cb) ->
-  c = new ACache {max_age_ms: 100, max_storage: 2}
+  c = new ACache {maxAgeMs: 100, maxStorage: 2}
   await
     for i in [0...10]
       c.query {
-        key_by: i # different keys so they can all run concurrently
+        keyBy: i # different keys so they can all run concurrently
         fn: (cb) -> async_counter (count) -> cb null, count
     }, defer err, count
   await async_counter defer count
@@ -122,7 +122,7 @@ exports.locking = (T, cb) ->
   await
     for i in [0...10]
       c.query {
-        key_by: 'shared' # same key so they will run one at a time, latter ones cached
+        keyBy: 'shared' # same key so they will run one at a time, latter ones cached
         fn: (cb) -> async_counter (count) -> cb null, count
     }, defer err, count
 
@@ -133,12 +133,12 @@ exports.locking = (T, cb) ->
 # -------
 
 exports.manual_put = (T, cb) ->
-  c = new ACache {max_age_ms: 50, max_storage: 3}
+  c = new ACache {maxAgeMs: 50, maxStorage: 3}
   arg = {a:1,b:2,delay:100}
-  c.put {key_by: arg}, {sum: 3, diff: -1}
+  c.put {keyBy: arg}, {sum: 3, diff: -1}
 
   await c.query {
-    key_by: arg
+    keyBy: arg
     fn: (cb) -> async_arithmetic arg, cb
   }, defer err, {sum, diff}, did_hit
   t2 = Date.now()
@@ -157,18 +157,18 @@ exports.manual_put = (T, cb) ->
 # -------
 
 exports.no_cache_error = (T, cb) ->
-  c = new ACache {max_age_ms: 50, max_storage: 3}
+  c = new ACache {maxAgeMs: 50, maxStorage: 3}
   arg = {a:1,b:2,delay:100}
 
   await c.query {
-    key_by: arg
+    keyBy: arg
     fn: (cb) -> cb new Error(), arg
   }, defer err, res
 
   t2 = Date.now()
 
   await c.query {
-    key_by: arg
+    keyBy: arg
     fn: (cb) -> cb new Error(), arg
   }, defer err, res
 
@@ -185,11 +185,11 @@ exports.no_cache_error = (T, cb) ->
 # -------
 
 exports.zero_answer_cached = (T, cb) ->
-  c = new ACache {max_age_ms: 50, max_storage: 3}
+  c = new ACache {maxAgeMs: 50, maxStorage: 3}
   arg = {a:0,b:0,delay:100}
 
   await c.query {
-    key_by: arg
+    keyBy: arg
     fn: (cb) -> async_add arg, cb
   }, defer err, res
   T.assert (not err) and (res is 0), "got 0"
@@ -197,7 +197,7 @@ exports.zero_answer_cached = (T, cb) ->
   t2 = Date.now()
 
   await c.query {
-    key_by: arg
+    keyBy: arg
     fn: (cb) -> async_add arg, cb
   }, defer err, res
   T.assert (not err) and (res is 0), "got 0"

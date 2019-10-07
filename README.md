@@ -23,11 +23,11 @@ Coffeescript example using a database call (but really, any expensive async call
 ```coffeescript
 {ACache} = require 'acache'
 
-ac = new ACache {max_age_ms: 10000, max_storage: 100}
+ac = new ACache {maxAgeMs: 10000, maxStorage: 100}
 
 # say, get something from the database, given 2 uid's
 ac.query {
-  key_by: [uid, friend_uid] # cache using both of these
+  keyBy: [uid, friend_uid] # cache using both of these
   fn: (cb) ->
     mysql.query 'SELECT BLEAH WHERE FOO=? AND BAR=?', [uid, friend_uid], (err, rows, info) ->
       res = {rows, info}
@@ -35,10 +35,10 @@ ac.query {
 }, defer err, res
 
 # remove something from the cache
-ac.uncache {key_by: [uid, friend_uid]}
+ac.uncache {keyBy: [uid, friend_uid]}
 
 # manually add something
-ac.put {key_by}, val
+ac.put {keyBy}, val
 
 # check some basic stats
 console.log ac.stats() # size, hits, misses, etc.
@@ -49,18 +49,18 @@ console.log ac.stats() # size, hits, misses, etc.
 ```coffeescript
 It calls back with a 3rd boolean param, whether the cache was hit:
 ac.query {
-  key_by: whatever
+  keyBy: whatever
   fn: (cb) -> cb null, "hello world"
 }, defer err, res, did_hit
 ```
 
 ### constructor params:
- * `max_age_ms`: max time to store something in cache
- * `max_storage`: max answers to cache
+ * `maxAgeMs`: max time to store something in cache
+ * `maxStorage`: max answers to cache
 
 ### `query` params:
  * arg0 (object):
-   * `key_by` : a key for this cache call. Feel free to pass a string, number, or object; it will be hashed
+   * `keyBy` : a key for this cache call. Feel free to pass a string, number, or object; it will be hashed
    * `fn` : a function to run, to fill the cache, if it's missing. your function should take one parameter, `cb`. It should then call `cb` with `err, res`
  * arg1 (fn) :
    * a function you want called with the results of your `fn`. Say, `err, res` from either the cache or hot read

@@ -20,12 +20,12 @@
 
   ACache = (function() {
     function ACache(_arg) {
-      var max_age_ms, max_storage, size_fn;
-      max_storage = _arg.max_storage, max_age_ms = _arg.max_age_ms, size_fn = _arg.size_fn;
+      var maxAgeMs, maxStorage, sizeFn;
+      maxStorage = _arg.maxStorage, maxAgeMs = _arg.maxAgeMs, sizeFn = _arg.sizeFn;
       this._lru = new LRU({
-        maxStorage: max_storage,
-        maxAgeMs: max_age_ms,
-        sizeFn: size_fn
+        maxStorage: maxStorage,
+        maxAgeMs: maxAgeMs,
+        sizeFn: sizeFn
       });
       this._lock_table = new LockTable();
       this._counter = 0;
@@ -35,11 +35,11 @@
     }
 
     ACache.prototype.query = function(_arg, cb) {
-      var ckey, did_hit, err, fn, key_by, lock, res, ___iced_passed_deferral, __iced_deferrals, __iced_k;
+      var ckey, did_hit, err, fn, keyBy, lock, res, ___iced_passed_deferral, __iced_deferrals, __iced_k;
       __iced_k = __iced_k_noop;
       ___iced_passed_deferral = iced.findDeferral(arguments);
-      fn = _arg.fn, key_by = _arg.key_by;
-      ckey = this._cacheKey(key_by);
+      fn = _arg.fn, keyBy = _arg.keyBy;
+      ckey = this._cacheKey(keyBy);
       err = null;
       res = null;
       did_hit = false;
@@ -128,22 +128,22 @@
     };
 
     ACache.prototype.uncache = function(_arg) {
-      var key_by;
-      key_by = _arg.key_by;
-      return this._lru.remove(this._cacheKey(key_by));
+      var keyBy;
+      keyBy = _arg.keyBy;
+      return this._lru.remove(this._cacheKey(keyBy));
     };
 
     ACache.prototype.put = function(_arg, res) {
-      var key_by;
-      key_by = _arg.key_by;
-      this._lru.put(this._cacheKey(key_by), res);
+      var keyBy;
+      keyBy = _arg.keyBy;
+      this._lru.put(this._cacheKey(keyBy), res);
       return this._puts++;
     };
 
     ACache.prototype.peek = function(_arg) {
-      var key_by;
-      key_by = _arg.key_by;
-      return this._lru.get(this._cacheKey(key_by));
+      var keyBy;
+      keyBy = _arg.keyBy;
+      return this._lru.get(this._cacheKey(keyBy));
     };
 
     ACache.prototype._cacheKey = function(o) {
