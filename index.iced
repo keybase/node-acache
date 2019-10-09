@@ -1,13 +1,5 @@
 LRU         = require 'kb-node-lru'
 LockTable   = require('iced-utils').lock.Table
-crypto      = require 'crypto'
-hash        = require 'object-hash'
-
-# -------------------------------------------------------------------------
-
-CONFIG =
-  HASH_LEN: 20
-  MAX_STRING_AS_KEY: 60
 
 # -------------------------------------------------------------------------
 

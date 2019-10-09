@@ -4,8 +4,8 @@
 
 {ACache} = require('./index')
 
-INSERTS = 100 * 1000
-STORAGE = 100 * 1000
+INSERTS = 1000 * 1000
+STORAGE = 1000 * 1000
 
 print_usage = (ac, stage, ms, ops) =>
     perItem = process.memoryUsage().heapUsed / ac.size()
