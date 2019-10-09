@@ -1,13 +1,5 @@
 LRU         = require 'kb-node-lru'
 LockTable   = require('iced-utils').lock.Table
-crypto      = require 'crypto'
-hash        = require 'object-hash'
-
-# -------------------------------------------------------------------------
-
-CONFIG =
-  HASH_LEN: 20
-  MAX_STRING_AS_KEY: 60
 
 # -------------------------------------------------------------------------
 
@@ -24,21 +16,35 @@ class ACache
   ##----------------------------------------------------------------------
 
   query: ({fn, keyBy}, cb) ->
-    ckey       = @_cacheKey keyBy
     err        = null
     res        = null
     did_hit    = false
-    await @_lock_table.acquire ckey, defer(lock), true
-    if @_counter++ % 100 is 0 # faster than doing it every time
+
+    if typeof(keyBy) is 'object'
+      throw new Error('acache requires a scalar key, such as a string')
+
+    # prevents stack max size exceeded when everything in cache and no IO needed
+    if @_counter++ % 100 is 0
       await process.nextTick defer()
-    if typeof (res = @_lru.get ckey) isnt 'undefined'
+
+    # allow a quick exit if possible
+    # where we don't even bother with the lock
+    if typeof (res = @_lru.get keyBy) isnt 'undefined'
+      @_hits++
+      did_hit = true
+      return cb null, res, did_hit
+
+    # otherwise await the lock and check again,
+    # and if still missing, we'll do the work
+    await @_lock_table.acquire keyBy, defer(lock), true
+    if typeof (res = @_lru.get keyBy) isnt 'undefined'
       @_hits++
       did_hit = true
     else
       @_misses++
       await fn defer err, res
       unless err?
-        @_lru.put ckey, res
+        @_lru.put keyBy, res
     cb err, res, did_hit
 
     lock.release()
@@ -53,27 +59,20 @@ class ACache
 
   ##----------------------------------------------------------------------
 
-  uncache: ({keyBy}) -> @_lru.remove @_cacheKey keyBy
+  uncache: ({keyBy}) -> @_lru.remove keyBy
 
   ##----------------------------------------------------------------------
 
   put: ({keyBy}, res) ->
     # manually put something into the cache
-    @_lru.put @_cacheKey(keyBy), res
+    @_lru.put keyBy, res
     @_puts++
 
   ##----------------------------------------------------------------------
 
-  peek : ({keyBy}) ->
-    @_lru.get @_cacheKey(keyBy)
+  peek : ({keyBy}) -> @_lru.get keyBy
 
   ##----------------------------------------------------------------------
-
-  _cacheKey: (o) ->
-    # for strings we'd rather not hash which ends up being expensive
-    if (typeof(o) is 'string') and o.length <= CONFIG.MAX_STRING_AS_KEY then return o
-    if (typeof(o) is 'number') then return o
-    return hash(o,{encoding:'base64'})[...CONFIG.HASH_LEN]
 
 # =============================================================================
 
