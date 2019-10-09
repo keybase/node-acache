@@ -21,4 +21,7 @@ clean:
 test:
 	$(ICED) test/run.iced
 
+memtest:
+	$(ICED) --compile --print memtest.iced | node --expose-gc
+
 .PHONY: clean test

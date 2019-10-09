@@ -35,52 +35,54 @@
     }
 
     ACache.prototype.query = function(_arg, cb) {
-      var ckey, did_hit, err, fn, keyBy, lock, res, ___iced_passed_deferral, __iced_deferrals, __iced_k;
+      var did_hit, err, fn, keyBy, lock, res, ___iced_passed_deferral, __iced_deferrals, __iced_k;
       __iced_k = __iced_k_noop;
       ___iced_passed_deferral = iced.findDeferral(arguments);
       fn = _arg.fn, keyBy = _arg.keyBy;
-      ckey = this._cacheKey(keyBy);
       err = null;
       res = null;
       did_hit = false;
+      if (typeof keyBy === 'object') {
+        throw new Error('acache requires a scalar key, such as a string');
+      }
       (function(_this) {
         return (function(__iced_k) {
-          __iced_deferrals = new iced.Deferrals(__iced_k, {
-            parent: ___iced_passed_deferral,
-            filename: "/Users/chris/go/src/github.com/keybase/node-acache/index.iced",
-            funcname: "ACache.query"
-          });
-          _this._lock_table.acquire(ckey, __iced_deferrals.defer({
-            assign_fn: (function() {
-              return function() {
-                return lock = arguments[0];
-              };
-            })(),
-            lineno: 30
-          }), true);
-          __iced_deferrals._fulfill();
+          if (_this._counter++ % 100 === 0) {
+            (function(__iced_k) {
+              __iced_deferrals = new iced.Deferrals(__iced_k, {
+                parent: ___iced_passed_deferral,
+                filename: "/Users/chris/go/src/github.com/keybase/node-acache/index.iced",
+                funcname: "ACache.query"
+              });
+              process.nextTick(__iced_deferrals.defer({
+                lineno: 35
+              }));
+              __iced_deferrals._fulfill();
+            })(__iced_k);
+          } else {
+            return __iced_k();
+          }
         });
       })(this)((function(_this) {
         return function() {
           (function(__iced_k) {
-            if (_this._counter++ % 100 === 0) {
-              (function(__iced_k) {
-                __iced_deferrals = new iced.Deferrals(__iced_k, {
-                  parent: ___iced_passed_deferral,
-                  filename: "/Users/chris/go/src/github.com/keybase/node-acache/index.iced",
-                  funcname: "ACache.query"
-                });
-                process.nextTick(__iced_deferrals.defer({
-                  lineno: 32
-                }));
-                __iced_deferrals._fulfill();
-              })(__iced_k);
-            } else {
-              return __iced_k();
-            }
+            __iced_deferrals = new iced.Deferrals(__iced_k, {
+              parent: ___iced_passed_deferral,
+              filename: "/Users/chris/go/src/github.com/keybase/node-acache/index.iced",
+              funcname: "ACache.query"
+            });
+            _this._lock_table.acquire(keyBy, __iced_deferrals.defer({
+              assign_fn: (function() {
+                return function() {
+                  return lock = arguments[0];
+                };
+              })(),
+              lineno: 46
+            }), true);
+            __iced_deferrals._fulfill();
           })(function() {
             (function(__iced_k) {
-              if (typeof (res = _this._lru.get(ckey)) !== 'undefined') {
+              if (typeof (res = _this._lru.get(keyBy)) !== 'undefined') {
                 _this._hits++;
                 return __iced_k(did_hit = true);
               } else {
@@ -98,11 +100,11 @@
                         return res = arguments[1];
                       };
                     })(),
-                    lineno: 38
+                    lineno: 52
                   }));
                   __iced_deferrals._fulfill();
                 })(function() {
-                  return __iced_k(err == null ? _this._lru.put(ckey, res) : void 0);
+                  return __iced_k(err == null ? _this._lru.put(keyBy, res) : void 0);
                 });
               }
             })(function() {
@@ -130,32 +132,20 @@
     ACache.prototype.uncache = function(_arg) {
       var keyBy;
       keyBy = _arg.keyBy;
-      return this._lru.remove(this._cacheKey(keyBy));
+      return this._lru.remove(keyBy);
     };
 
     ACache.prototype.put = function(_arg, res) {
       var keyBy;
       keyBy = _arg.keyBy;
-      this._lru.put(this._cacheKey(keyBy), res);
+      this._lru.put(keyBy, res);
       return this._puts++;
     };
 
     ACache.prototype.peek = function(_arg) {
       var keyBy;
       keyBy = _arg.keyBy;
-      return this._lru.get(this._cacheKey(keyBy));
-    };
-
-    ACache.prototype._cacheKey = function(o) {
-      if ((typeof o === 'string') && o.length <= CONFIG.MAX_STRING_AS_KEY) {
-        return o;
-      }
-      if (typeof o === 'number') {
-        return o;
-      }
-      return hash(o, {
-        encoding: 'base64'
-      }).slice(0, CONFIG.HASH_LEN);
+      return this._lru.get(keyBy);
     };
 
     return ACache;
