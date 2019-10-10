@@ -1,5 +1,6 @@
 LRU         = require 'kb-node-lru'
 LockTable   = require('iced-utils').lock.Table
+util        = require('util')
 
 # -------------------------------------------------------------------------
 
@@ -20,8 +21,10 @@ class ACache
     res        = null
     did_hit    = false
 
-    if typeof(keyBy) is 'object'
-      throw new Error('acache requires a scalar key, such as a string')
+    typ = typeof keyBy
+    if typ is 'object' or typ is 'function' or typ is 'undefined'
+      msg = "acache requires a scalar key. Got #{util.inspect keyBy}"
+      throw new Error(msg)
 
     # prevents stack max size exceeded when everything in cache and no IO needed
     if @_counter++ % 100 is 0

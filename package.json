@@ -1,6 +1,6 @@
 {
   "name": "acache",
-  "version": "5.0.0",
+  "version": "5.0.1",
   "description": "A simple JavaScript locking/caching of async queries/call results",
   "main": "index.js",
   "scripts": {
