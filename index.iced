@@ -1,5 +1,5 @@
 LRU         = require 'kb-node-lru'
-LockTable   = require('iced-utils').lock.Table
+LockTable   = require('iced-lock').Table
 util        = require('util')
 
 # -------------------------------------------------------------------------
@@ -39,7 +39,8 @@ class ACache
 
     # otherwise await the lock and check again,
     # and if still missing, we'll do the work
-    await @_lock_table.acquire keyBy, defer(lock), true
+    await @_lock_table.acquire2 {name : keyBy}, defer(lock)
+
     if typeof (res = @_lru.get keyBy) isnt 'undefined'
       @_hits++
       did_hit = true

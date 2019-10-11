@@ -51,19 +51,14 @@ iced-coffee-script@^108.0.9:
     iced-runtime ">=0.0.1"
     uglify-js "^3.5.9"
 
-iced-error@^0.0.10:
-  version "0.0.10"
-  resolved "https://registry.yarnpkg.com/iced-error/-/iced-error-0.0.10.tgz#f82e4368f79f4afdf3ed20375acc28a8702809e8"
-  integrity sha1-+C5DaPefSv3z7SA3WswoqHAoCeg=
-
-iced-lock@^1.0.2:
-  version "1.1.0"
-  resolved "https://registry.yarnpkg.com/iced-lock/-/iced-lock-1.1.0.tgz#6116ef1cab3acd6e6b10893bb27ba622fd3fde72"
-  integrity sha1-YRbvHKs6zW5rEIk7snumIv0/3nI=
+iced-lock@^2.0.1:
+  version "2.0.1"
+  resolved "https://registry.yarnpkg.com/iced-lock/-/iced-lock-2.0.1.tgz#92fe46ffe01b872bf88f963c2a319fa8ad80d13b"
+  integrity sha512-J6dnGMpAoHNyACUYJYhiJkLY7YFRTa7NMZ8ZygpYB3HNDOGWtzv55+kT2u1zItRi4Y1EXruG9d1VDsx8R5faTw==
   dependencies:
     iced-runtime "^1.0.0"
 
-iced-runtime@>=0.0.1, "iced-runtime@>=0.0.1 <2.0.0-0", iced-runtime@^1.0.0, iced-runtime@^1.0.4:
+iced-runtime@>=0.0.1, iced-runtime@^1.0.0:
   version "1.0.4"
   resolved "https://registry.yarnpkg.com/iced-runtime/-/iced-runtime-1.0.4.tgz#e9de26dfe98cd8621201f7f3dfb9f7f09c550990"
   integrity sha512-rgiJXNF6ZgF2Clh/TKUlBDW3q51YPDJUXmxGQXx1b8tbZpVpTn+1RX9q1sjNkujXIIaVxZByQzPHHORg7KV51g==
@@ -77,15 +72,6 @@ iced-test@0.0.22:
     deep-equal ">=0.2.1"
     iced-runtime ">=0.0.1"
     minimist ">=0.0.8"
-
-iced-utils@^0.1.24:
-  version "0.1.27"
-  resolved "https://registry.yarnpkg.com/iced-utils/-/iced-utils-0.1.27.tgz#dcd4da765dbe93f2af12576d0c2dac9a6b35a172"
-  integrity sha512-Yi17vdjWBXfdqYEA08mCVy1AcLCkj7UsUg3/wCJUMeE5/ZWilc2vhM7nlFpRXpa9LYgbPbg8fNAnP5V8L+TZdw==
-  dependencies:
-    iced-error "^0.0.10"
-    iced-lock "^1.0.2"
-    iced-runtime ">=0.0.1 <2.0.0-0"
 
 is-arguments@^1.0.4:
   version "1.0.4"
