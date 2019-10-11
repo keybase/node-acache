@@ -76,17 +76,13 @@
             }, __iced_deferrals.defer({
               assign_fn: (function() {
                 return function() {
-                  err = arguments[0];
-                  return lock = arguments[1];
+                  return lock = arguments[0];
                 };
               })(),
               lineno: 41
             }));
             __iced_deferrals._fulfill();
           })(function() {
-            if (err != null) {
-              return cb(err, null, false);
-            }
             (function(__iced_k) {
               if (typeof (res = _this._lru.get(keyBy)) !== 'undefined') {
                 _this._hits++;
@@ -106,7 +102,7 @@
                         return res = arguments[1];
                       };
                     })(),
-                    lineno: 49
+                    lineno: 48
                   }));
                   __iced_deferrals._fulfill();
                 })(function() {

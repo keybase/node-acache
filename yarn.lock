@@ -51,10 +51,10 @@ iced-coffee-script@^108.0.9:
     iced-runtime ">=0.0.1"
     uglify-js "^3.5.9"
 
-iced-lock@^2.0.0:
-  version "2.0.0"
-  resolved "https://registry.yarnpkg.com/iced-lock/-/iced-lock-2.0.0.tgz#2296afec588f5c3cc464cd79c36506b02fe47ec9"
-  integrity sha512-4XY/wVsVV/o2C8jcYs3oydQSHnomwEAHfp9+wnk4vNc34nw7FjsWMIGlxPZhZx0oyYJEyc3AZ5cpoPe6npHe3A==
+iced-lock@^2.0.1:
+  version "2.0.1"
+  resolved "https://registry.yarnpkg.com/iced-lock/-/iced-lock-2.0.1.tgz#92fe46ffe01b872bf88f963c2a319fa8ad80d13b"
+  integrity sha512-J6dnGMpAoHNyACUYJYhiJkLY7YFRTa7NMZ8ZygpYB3HNDOGWtzv55+kT2u1zItRi4Y1EXruG9d1VDsx8R5faTw==
   dependencies:
     iced-runtime "^1.0.0"
 

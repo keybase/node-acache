@@ -39,8 +39,7 @@ class ACache
 
     # otherwise await the lock and check again,
     # and if still missing, we'll do the work
-    await @_lock_table.acquire2 {name : keyBy}, defer(err, lock)
-    if err? then return cb err, null, false
+    await @_lock_table.acquire2 {name : keyBy}, defer(lock)
 
     if typeof (res = @_lru.get keyBy) isnt 'undefined'
       @_hits++
