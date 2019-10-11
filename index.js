@@ -7,7 +7,7 @@
 
   LRU = require('kb-node-lru');
 
-  LockTable = require('iced-utils').lock.Table;
+  LockTable = require('iced-lock').Table;
 
   util = require('util');
 
@@ -46,7 +46,7 @@
             (function(__iced_k) {
               __iced_deferrals = new iced.Deferrals(__iced_k, {
                 parent: ___iced_passed_deferral,
-                filename: "/Users/chris/go/src/github.com/keybase/node-acache/index.iced",
+                filename: "/Users/max/src/iced/node-acache/index.iced",
                 funcname: "ACache.query"
               });
               process.nextTick(__iced_deferrals.defer({
@@ -68,19 +68,25 @@
           (function(__iced_k) {
             __iced_deferrals = new iced.Deferrals(__iced_k, {
               parent: ___iced_passed_deferral,
-              filename: "/Users/chris/go/src/github.com/keybase/node-acache/index.iced",
+              filename: "/Users/max/src/iced/node-acache/index.iced",
               funcname: "ACache.query"
             });
-            _this._lock_table.acquire(keyBy, __iced_deferrals.defer({
+            _this._lock_table.acquire2({
+              name: keyBy
+            }, __iced_deferrals.defer({
               assign_fn: (function() {
                 return function() {
-                  return lock = arguments[0];
+                  err = arguments[0];
+                  return lock = arguments[1];
                 };
               })(),
               lineno: 41
-            }), true);
+            }));
             __iced_deferrals._fulfill();
           })(function() {
+            if (err != null) {
+              return cb(err, null, false);
+            }
             (function(__iced_k) {
               if (typeof (res = _this._lru.get(keyBy)) !== 'undefined') {
                 _this._hits++;
@@ -90,7 +96,7 @@
                 (function(__iced_k) {
                   __iced_deferrals = new iced.Deferrals(__iced_k, {
                     parent: ___iced_passed_deferral,
-                    filename: "/Users/chris/go/src/github.com/keybase/node-acache/index.iced",
+                    filename: "/Users/max/src/iced/node-acache/index.iced",
                     funcname: "ACache.query"
                   });
                   fn(__iced_deferrals.defer({
@@ -100,7 +106,7 @@
                         return res = arguments[1];
                       };
                     })(),
-                    lineno: 47
+                    lineno: 49
                   }));
                   __iced_deferrals._fulfill();
                 })(function() {
